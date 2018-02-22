@@ -157,14 +157,20 @@ class BagWidget(QWidget):
             self._handle_faster_clicked()
         elif key == Qt.Key_Minus:
             self._handle_slower_clicked()
-        elif key == Qt.Key_Left:
+        elif key == Qt.Key_Up :
             self._timeline.translate_timeline_left()
-        elif key == Qt.Key_Right:
+        elif key == Qt.Key_Down:
             self._timeline.translate_timeline_right()
-        elif key == Qt.Key_Up or key == Qt.Key_PageUp:
+        elif key == Qt.Key_PageUp:
             self._handle_zoom_in_clicked()
-        elif key == Qt.Key_Down or key == Qt.Key_PageDown:
+        elif key == Qt.Key_PageDown:
             self._handle_zoom_out_clicked()
+        elif  key == Qt.Key_Left :
+            self._handle_previous_clicked()
+        elif  key == Qt.Key_Right :
+            self._handle_next_clicked()
+
+
 
     def handle_destroy(self, args):
         self._timeline.handle_close()
