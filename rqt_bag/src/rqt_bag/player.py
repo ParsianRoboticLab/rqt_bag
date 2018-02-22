@@ -116,8 +116,8 @@ class Player(QObject):
         :param msg_data: tuple of the message data and topic info, ''(str, msg)''
         """
         # Don't publish unless the playhead is moving.
-        if self.timeline.play_speed <= 0.0:
-            return
+        # if self.timeline.play_speed <= 0.0:
+        #     return
 
         topic, msg, clock = msg_data
 
