@@ -4,12 +4,11 @@
       A Python GUI plugin for displaying and replaying ROS bag files.
     </description>
     <qtgui>
-      <group>
-        <label>Logging</label>
-        <icon type="theme">folder</icon>
-        <statustip>Plugins related to logging.</statustip>
+     <group>
+        <label>Parsian</label>
+        <icon>resource/icons/parsian_logo.jpg</icon>
       </group>
-      <label>Bag</label>
+      <label>Logger</label>
       <icon type="theme">applications-other</icon>
       <statustip>A Python GUI plugin for displaying and replaying ROS bag files.</statustip>
     </qtgui>
