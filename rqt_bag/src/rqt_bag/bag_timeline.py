@@ -134,6 +134,7 @@ class BagTimeline(QGraphicsScene):
         if self.background_task is not None:
             self.background_task_cancel = True
         self._timeline_frame.handle_close()
+        self.removeItem(self._timeline_frame)
         for bag in self._bags:
             bag.close()
         for frame in self._views:
@@ -142,12 +143,19 @@ class BagTimeline(QGraphicsScene):
 
     # Bag Management and access
     def add_bag(self, bag):
-        """
+        print "add bag"
+        self._timeline_frame = TimelineFrame(self)
+        self._timeline_frame.setPos(0, 0)
+        self.addItem(self._timeline_frame)
+
+
+        """     
         creates an indexing thread for each new topic in the bag
         fixes the boarders and notifies the indexing thread to index the new items bags
         :param bag: ros bag file, ''rosbag.bag''
         """
         self._bags.append(bag)
+
 
         bag_topics = bag_helper.get_topics(bag)
 
@@ -162,6 +170,9 @@ class BagTimeline(QGraphicsScene):
         self._timeline_frame._end_stamp = self._get_end_stamp()
         self._timeline_frame.topics = self._get_topics()
         self._timeline_frame._topics_by_datatype = self._get_topics_by_datatype()
+        for topic in new_topics:
+            if not self.start_publishing(topic):
+                break
         # If this is the first bag, reset the timeline
         if self._timeline_frame._stamp_left is None:
             self._timeline_frame.reset_timeline()

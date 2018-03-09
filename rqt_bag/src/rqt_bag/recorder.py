@@ -230,6 +230,10 @@ class Recorder(object):
 
                 # Write to the bag
                 with self._bag_lock:
+                    if(topic=="/world_model"):
+                        topic="/logs/world_model"
+                    if(topic=="/draws"):
+                        topic="/logs/draws"
                     self._bag.write(topic, m, t)
 
                 # Notify listeners that a message has been recorded

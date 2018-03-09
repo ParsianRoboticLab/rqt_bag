@@ -6,7 +6,6 @@
     <qtgui>
      <group>
         <label>Parsian</label>
-        <icon>resource/icons/parsian_logo.jpg</icon>
       </group>
       <label>Logger</label>
       <icon type="theme">applications-other</icon>

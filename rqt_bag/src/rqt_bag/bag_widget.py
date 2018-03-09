@@ -38,7 +38,7 @@ import rospkg
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import qDebug, Qt, qWarning, Signal
-from python_qt_binding.QtGui import QIcon
+from python_qt_binding.QtGui import QIcon, QResizeEvent
 from python_qt_binding.QtWidgets import QFileDialog, QGraphicsView, QWidget
 
 import rosbag
@@ -69,6 +69,8 @@ class BagWidget(QWidget):
         loadUi(ui_file, self, {'BagGraphicsView': BagGraphicsView})
 
         self.setObjectName('BagWidget')
+        self._context=context
+        self._publish_clock=publish_clock
 
         self._timeline = BagTimeline(context, publish_clock)
         self.graphics_view.setScene(self._timeline)
@@ -237,7 +239,23 @@ class BagWidget(QWidget):
     def _handle_record_clicked(self):
         if self._recording:
             self._timeline.toggle_recording()
+            self._timeline.handle_close()
+            self.load_button.setEnabled(True)
+            self._recording=False
+            self._timeline=BagTimeline(self._context, self._publish_clock)
+            self.graphics_view.setScene(self._timeline)
+
+            self.graphics_view.resizeEvent = self._resizeEvent
+            self.graphics_view.setMouseTracking(True)
+            self.graphics_view.mousePressEvent = self._timeline.on_mouse_down
+            self.graphics_view.mouseReleaseEvent = self._timeline.on_mouse_up
+            self.graphics_view.mouseMoveEvent = self._timeline.on_mouse_move
+            self.graphics_view.wheelEvent = self._timeline.on_mousewheel
+            self.graphics_view.keyPressEvent = self.graphics_view_on_key_press
+            self._resizeEvent(QResizeEvent)
+            self.load_bag(self.lastRecorded_fileName)
             return
+
 
         #TODO Implement limiting by regex and by number of messages per topic
         self.topic_selection = TopicSelection()
@@ -258,6 +276,7 @@ class BagWidget(QWidget):
                 record_filename = '%s_%s' % (prefix, record_filename)
 
             rospy.loginfo('Recording to %s.' % record_filename)
+            self.lastRecorded_fileName=record_filename
 
             self.load_button.setEnabled(False)
             self._recording = True
@@ -365,4 +384,5 @@ class BagWidget(QWidget):
     # Shutdown all members
 
     def shutdown_all(self):
+        print "come on"
         self._timeline.handle_close()

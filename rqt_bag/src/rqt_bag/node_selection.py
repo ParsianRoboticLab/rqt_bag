@@ -42,7 +42,7 @@ class NodeSelection(QWidget):
         self.parent_widget = parent
         self.selected_nodes = []
         self.setWindowTitle("Select the nodes you want to record")
-        self.resize(500, 700)
+        self.resize(500, 500)
         self.area = QScrollArea(self)
         self.main_widget = QWidget(self.area)
         self.ok_button = QPushButton("Done", self)
@@ -58,7 +58,10 @@ class NodeSelection(QWidget):
         self.node_list = rosnode.get_node_names()
         self.node_list.sort()
         for node in self.node_list:
-            self.addCheckBox(node)
+            # add planner node by choosing agent number
+            if "planner" not in node:
+                self.addCheckBox(node)
+
         self.main_widget.setLayout(self.selection_vlayout)
         self.show()
 
@@ -70,8 +73,13 @@ class NodeSelection(QWidget):
     def updateNode(self, state, node):
         if state == Qt.Checked:
             self.selected_nodes.append(node)
+            if "planner"+"_"+node.split("_")[1] in self.node_list:
+                self.selected_nodes.append("planner"+"_"+node.split("_")[1])
         else:
             self.selected_nodes.remove(node)
+            if "planner"+"_"+node.split("_")[1] in self.node_list:
+                self.selected_nodes.remove("planner"+"_"+node.split("_")[1])
+
         if len(self.selected_nodes) > 0:
             self.ok_button.setEnabled(True)
         else:
@@ -80,8 +88,15 @@ class NodeSelection(QWidget):
     def onButtonClicked(self):
         master = rosgraph.Master('rqt_bag_recorder')
         state = master.getSystemState()
+        print state[1]
         subs = [t for t, l in state[1]
                 if len([node_name for node_name in self.selected_nodes if node_name in l]) > 0]
+
+        topic_data_list = master.getPublishedTopics('')
+        topic_data_list.sort()
+        for topic, datatype in topic_data_list:
+            if("/"+topic.split("/")[1]+"/task" in subs):
+                subs.append(topic)
         for topic in subs:
             self.parent_widget.changeTopicCheckState(topic, Qt.Checked)
             self.parent_widget.updateList(Qt.Checked, topic)
