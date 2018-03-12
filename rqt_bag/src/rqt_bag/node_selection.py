@@ -42,7 +42,7 @@ class NodeSelection(QWidget):
         self.parent_widget = parent
         self.selected_nodes = []
         self.setWindowTitle("Select the nodes you want to record")
-        self.resize(500, 500)
+        self.resize(300, 300)
         self.area = QScrollArea(self)
         self.main_widget = QWidget(self.area)
         self.ok_button = QPushButton("Done", self)
@@ -63,6 +63,8 @@ class NodeSelection(QWidget):
                 self.addCheckBox(node)
 
         self.main_widget.setLayout(self.selection_vlayout)
+        self.area.setWidget(self.main_widget)
+
         self.show()
 
     def addCheckBox(self, node):
