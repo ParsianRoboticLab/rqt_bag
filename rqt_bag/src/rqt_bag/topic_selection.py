@@ -68,8 +68,14 @@ class TopicSelection(QWidget):
 
         self.selection_vlayout = QVBoxLayout(self)
         self.item_all = QCheckBox("All", self)
+        self.item_monitor = QCheckBox("Monitor", self)
+        self.item_monAge = QCheckBox("Monitor + Agents", self)
         self.item_all.stateChanged.connect(self.updateList)
+        self.item_monitor.stateChanged.connect(lambda x: self.updateList(x, "Monitor"))
+        self.item_monAge.stateChanged.connect(lambda x: self.updateList(x, "Monitor+"))
         self.selection_vlayout.addWidget(self.item_all)
+        self.selection_vlayout.addWidget(self.item_monitor)
+        self.selection_vlayout.addWidget(self.item_monAge)
         topic_data_list = master.getPublishedTopics('')
         topic_data_list.sort()
         for topic, datatype in topic_data_list:
@@ -105,6 +111,45 @@ class TopicSelection(QWidget):
                 for item in self.items_list:
                     if item.checkState() == Qt.Checked:
                         item.setCheckState(Qt.Unchecked)
+        elif topic == "Monitor" or topic == "Monitor+":
+            if state == Qt.Checked:
+                self.item_monitor.setTristate(False)
+                self.selected_topics.append("/world_model")
+                self.selected_topics.append("/draws")
+                self.selected_topics.append("/debugs")
+                self.selected_topics.append("/referee")
+                for item in self.items_list:
+                    if item.text() == "/world_model" \
+                            or item.text() == "/debugs" \
+                            or item.text() == "/draws" \
+                            or item.text() =="/referee":
+                        item.setCheckState(Qt.Checked)
+            elif state == Qt.Unchecked:
+                self.item_all.setTristate(False)
+                self.selected_topics.remove("/world_model")
+                self.selected_topics.remove("/draws")
+                self.selected_topics.remove("/debugs")
+                self.selected_topics.remove("/referee")
+                for item in self.items_list:
+                    if item.text() == "/world_model" \
+                            or item.text() =="/referee" \
+                            or item.text() =="/debugs" \
+                            or item.text()=="/draws":
+                        item.setCheckState(Qt.Unchecked)
+
+            if topic == "Monitor+":
+                if state == Qt.Checked:
+                    for item in self.items_list:
+                        if item.text().find("agent") >-1:
+                            self.selected_topics.append(item)
+                            item.setCheckState(Qt.Checked)
+
+                elif state == Qt.Unchecked:
+                    for item in self.items_list:
+                        if item.text().find("agent") >-1:
+                            self.selected_topics.remove(item)
+                            item.setCheckState(Qt.Unchecked)
+
         else:
             if state == Qt.Checked:
                 self.selected_topics.append(topic)
